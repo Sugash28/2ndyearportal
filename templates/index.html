@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Marks Display</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-size: 0.85rem;
+            overflow-x: hidden;
+        }
+        .student-photo {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #007bff;
+        }
+        .semester-table {
+            margin-bottom: 0;
+        }
+        .semester-table th,
+        .compact-table th {
+            background-color: #eef6ff;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .compact-table td {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .department-header {
+            background-color: #f8f9fa;
+            padding: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 1px solid #007bff;
+        }
+        .department-header h1 {
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+        .department-header h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+        .department-header h3 {
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+        .college-logo {
+            height: 40px;
+            width: auto;
+        }
+        .card {
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .card-header {
+            padding: 0.4rem 0.75rem;
+            font-size: 0.9rem;
+        }
+        .card-body {
+            padding: 0.5rem;
+        }
+        .cgpa-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin: 0;
+        }
+        .student-info {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .main-container {
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .search-form {
+            margin-bottom: 10px;
+        }
+        .form-control {
+            height: 32px;
+            font-size: 0.85rem;
+        }
+        .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
+        }
+        h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0;
+        }
+        .text-muted {
+            font-size: 0.8rem;
+        }
+        .table-responsive {
+            margin-bottom: 0;
+        }
+        .row {
+            margin-right: -5px;
+            margin-left: -5px;
+        }
+        .col, .col-md-3, .col-md-4, .col-md-5, .col-md-8, .col-md-12 {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="department-header">
+        <div class="head" style="display: flex; align-items: center; gap: 5px; justify-content: center;">
+            <img src="{{ url_for('static', filename='images/OIP.jpeg') }}" alt="College Logo" class="college-logo">
+            <h1>Kongunadu College of Engineering and Technology</h1>
+        </div>
+        <h4>DEPARTMENT OF ARTIFICIAL INTELLIGENCE AND DATA SCIENCE</h4>
+        <h3>UNIVERSITY MARK DETAILS</h3>
+    </div>
+
+    <div class="container-fluid main-container">
+        <div class="row search-form">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body p-2">
+                        <form method="POST" action="/" class="d-flex">
+                            <input type="text" name="register_no" class="form-control me-2" placeholder="Enter Register Number" required list="register-numbers" value="6213232430">
+                            <datalist id="register-numbers">
+                                {% for reg_no in available_students %}
+                                <option value="{{ reg_no }}">
+                                {% endfor %}
+                            </datalist>
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if error_message %}
+        <div class="alert alert-danger py-1 mb-2" role="alert">
+            {{ error_message }}
+        </div>
+        {% endif %}
+        
+        {% if result %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="student-info mb-2">
+                    <div class="row align-items-center">
+                        <div class="col-md-3 text-center">
+                            <img src="{{ url_for('static', filename=image_path) }}" alt="Student Photo" class="student-photo">
+                        </div>
+                        <div class="col-md-5 text-md-start text-center ps-1">
+                            <h3>{{ result.name }}</h3>
+                            <p class="text-muted mb-0">Register No: {{ result.register_no }}</p>
+                            <p class="text-muted mb-0">Department: AI and Data Science</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="cgpa-container">
+                                <p class="mb-0 small">Overall CGPA</p>
+                                <div class="cgpa-display">{{ result.cgpa | round(2) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Update just the profile section of your template -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">Profiles</div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>GitHub</th>
+              <th>LinkedIn</th>
+              <th>Portfolio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                {% if result.github and result.github != '-' %}
+                <a href="{{ result.github }}" target="_blank" class="text-primary">
+                  <i class="fab fa-github me-1"></i>GitHub Profile
+                </a>
+                {% else %}
+                N/A
+                {% endif %}
+              </td>
+
+              <td>
+                {% if result.linkedin and result.linkedin != '-' %}
+                <a href="{{ result.linkedin }}" target="_blank" class="text-primary">
+                  <i class="fab fa-linkedin me-1"></i>LinkedIn Profile
+                </a>
+                {% else %}
+                N/A
+                {% endif %}
+              </td>
+
+              <td>
+                {% if result.portfolio and result.portfolio != '-' %}
+                <a href="{{ result.portfolio }}" target="_blank" class="text-primary">
+                  <i class="fas fa-globe me-1"></i>Portfolio Website
+                </a>
+                {% else %}
+                N/A
+                {% endif %}
+              </td>
+              
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-2">
+                    <div class="card-header bg-primary text-white py-1">
+                        <h5 class="mb-0 small">Performance Summary</h5>
+                    </div>
+                    <div class="card-body p-2">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>SEM 1</th>
+                                        <th>SEM 2</th>
+                                        <th>SEM 3</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th>SGPA</th>
+                                        <td>{{ result.semesters[0].sgpa }}</td>
+                                        <td>{{ result.semesters[1].sgpa }}</td>
+                                        <td>{{ result.semesters[2].sgpa }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+    
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white py-1">
+                        <h5 class="mb-0 small">SEMESTER 1</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm compact-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subject in result.semesters[0].subjects %}
+                                    <tr>
+                                        <th>{{ subject }}</th>
+                                        <td>{{ result.semesters[0].marks[subject] }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white py-1">
+                        <h5 class="mb-0 small">SEMESTER 2</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm compact-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subject in result.semesters[1].subjects %}
+                                    <tr>
+                                        <th>{{ subject }}</th>
+                                        <td>{{ result.semesters[1].marks[subject] }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+         
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white py-1">
+                        <h5 class="mb-0 small">SEMESTER 3</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm compact-table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Subject</th>
+                                        <th>Grade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for subject in result.semesters[2].subjects %}
+                                    <tr>
+                                        <th>{{ subject }}</th>
+                                        <td>{{ result.semesters[2].marks[subject] }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+         <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Internal Assessment Test Marks</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                {% for subject in result.iat_marks.keys() %}
+                                <th class="text-center">{{ subject }}</th>
+                                {% endfor %}
+                                <th class="text-center">Failed Subjects</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                {% for mark in result.iat_marks.values() %}
+                                <td class="text-center">{{ mark }}</td>
+                                {% endfor %}
+                                <td class="text-center">{{ result.fail_count }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+     
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white py-1">
+                        <h5 class="mb-0 small">Event Participation</h5>
+                    </div>
+                    <div class="card-body p-1">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-sm compact-table mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Event Type</th>
+                                                <th>Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for event_type, count in result.event_counts.items() %}
+                                            <tr>
+                                                <td>{{ event_type }}</td>
+                                                <td>{{ count }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-center">
+                                <div class="text-center w-100">
+                                    <p class="mb-0 fw-bold">Total Prizes:</p>
+                                    <span class="fs-4 text-success">{{ result.prize_count }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            
+
+        
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white py-1">
+                        <h5 class="mb-0 small">NPTEL Courses</h5>
+                    </div>
+                    <div class="card-body p-1">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm compact-table mb-0">
+                                <thead>
+                                    <tr>
+                                        {% for course in result.courses %}
+                                        <th>{{ course.column }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        {% for course in result.courses %}
+                                        <td>{{ course.value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+       <div class="row">
+        <div class="card col-md-6">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Value Added Courses</h5>
+            </div>
+            <div class="card-body">
+                {% if result.value_added_courses %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in result.value_added_courses %}
+                            <tr>
+                                <td>{{ course.name }}</td>
+                                <td>{{ course.details }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No value added courses found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div class="card col-md-6">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Industrial Visits</h5>
+            </div>
+            <div class="card-body">
+                {% if result.industrial_visits %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Visit</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visit in result.industrial_visits %}
+                            <tr>
+                                <td>{{ visit.name }}</td>
+                                <td>{{ visit.details }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No industrial visits found.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        
+        {% endif %}
+
+
+    </div>
+        
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
