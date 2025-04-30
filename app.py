@@ -5,8 +5,15 @@ from pathlib import Path
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'static/images'
-STUDENT_PHOTOS_FOLDER = 'static/images/student_photos'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Update paths to use absolute paths
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'images')
+STUDENT_PHOTOS_FOLDER = os.path.join(BASE_DIR, 'static', 'images', 'student_photos')
+EXCEL_FILE_PATH = os.path.join(BASE_DIR, 'merged_output.xlsx')
+
+# Create directories if they don't exist
+os.makedirs(STUDENT_PHOTOS_FOLDER, exist_ok=True)
 def load_excel_data(excel_path):
     try:
         df = pd.read_excel(excel_path)
@@ -248,7 +255,7 @@ def index():
     error_message = None
     available_students = []
     try:
-        df = load_excel_data('merged_output.xlsx')
+        df = load_excel_data(EXCEL_FILE_PATH)
         if not df.empty and 'Register No' in df.columns:
             available_students = df['Register No'].astype(str).tolist()
     except Exception as e:
