@@ -9,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Update paths to use absolute paths
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'static', 'images')
-STUDENT_PHOTOS_FOLDER = os.path.join(BASE_DIR, 'static', 'images', 'student_photos')
+STUDENT_PHOTOS_FOLDER = os.path.join(BASE_DIR, 'static', 'images', 'Student_Photos')
 EXCEL_FILE_PATH = os.path.join(BASE_DIR, 'merged_output.xlsx')
 
 # Create directories if they don't exist
