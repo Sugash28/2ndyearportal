@@ -277,7 +277,7 @@ def index():
                         photo_filename = f"{register_no}{ext}"
                         photo_path = os.path.join(STUDENT_PHOTOS_FOLDER, photo_filename)
                         if os.path.exists(photo_path):
-                            image_path = f"images/student_photos/{photo_filename}"
+                            image_path = f"images/Student_Photos/{photo_filename}"
                             break
                     
                     if not image_path:
