@@ -155,7 +155,11 @@
                 <div class="student-info mb-2">
                     <div class="row align-items-center">
                         <div class="col-md-3 text-center">
-                            <img src="{{ url_for('static', filename=image_path) }}" alt="Student Photo" class="student-photo">
+                            {% if image_path %}
+                                <img src="{{ url_for('static', filename=image_path) }}" alt="Student Photo" class="student-photo">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/OIP.jpg') }}" alt="Default Photo" class="student-photo">
+                            {% endif %}
                         </div>
                         <div class="col-md-5 text-md-start text-center ps-1">
                             <h3>{{ result.name }}</h3>

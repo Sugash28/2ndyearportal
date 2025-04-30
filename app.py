@@ -254,12 +254,14 @@ def index():
     image_path = None
     error_message = None
     available_students = []
+    
     try:
         df = load_excel_data(EXCEL_FILE_PATH)
         if not df.empty and 'Register No' in df.columns:
             available_students = df['Register No'].astype(str).tolist()
     except Exception as e:
         error_message = f"Error loading Excel file: {str(e)}"
+        app.logger.error(f"Excel load error: {str(e)}")
     
     if request.method == 'POST':
         register_no = request.form.get('register_no')
@@ -269,42 +271,26 @@ def index():
                 result = get_student_details(df, register_no)
                 
                 if result:
+                    # Check for student photo
                     possible_extensions = ['.jpg', '.jpeg', '.png']
-                    image_found = False
-                    search_paths =[
-                        f"static/images/student_photos/{register_no}",
-                        f"Student Photos/Student Photos/{register_no}"
-                    ]
-                    
-                    for base_path in search_paths:
-                        for ext in possible_extensions:
-                            full_path = f"{base_path}{ext}"
-                            if os.path.exists(full_path):
-                                if base_path.startswith("Student Photos"):
-                                    import shutil
-                                    new_path = f"static/images/student_photos/{register_no}{ext}"
-                                    os.makedirs(os.path.dirname(new_path), exist_ok=True)
-                                    try:
-                                        shutil.copy(full_path, new_path)
-                                        print(f"Copied image from {full_path} to {new_path}")
-                                        image_path = f"images/student_photos/{register_no}{ext}"
-                                    except Exception as copy_error:
-                                        print(f"Error copying image: {copy_error}")
-                                        image_path = f"../Student Photos/Student Photos/{register_no}{ext}"
-                                else:
-                                    image_path = f"images/student_photos/{register_no}{ext}"
-                                image_found = True
-                                break
-                        if image_found:
+                    for ext in possible_extensions:
+                        photo_filename = f"{register_no}{ext}"
+                        photo_path = os.path.join(STUDENT_PHOTOS_FOLDER, photo_filename)
+                        if os.path.exists(photo_path):
+                            image_path = f"images/student_photos/{photo_filename}"
                             break
+                    
+                    if not image_path:
+                        image_path = 'images/default.jpg'
+                        app.logger.warning(f"No image found for student {register_no}")
         except Exception as e:
             error_message = f"Error processing request: {str(e)}"
+            app.logger.error(f"Request processing error: {str(e)}")
     
     return render_template('index.html', 
-                          result=result, 
-                          image_path=image_path, 
-                          error_message=error_message,
-                          available_students=available_students)
-
+                         result=result, 
+                         image_path=image_path, 
+                         error_message=error_message,
+                         available_students=available_students)
 if __name__ == '__main__':
     app.run(debug=True)
